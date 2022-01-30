@@ -14,6 +14,7 @@ function App() {
   const [stateText, setStateText] = useState<string>('welcome')
   const [chatLog, setChatLog] = useState<string[]>([''])
   const [lamportClock, setLamportClock] = useState<number>(0)
+  const [listOfConnections, setListOfConnections] = useState<Peer.DataConnection[]>([])
   const peerInstance = useRef<Peer>()
   const connectionInstance = useRef<Peer.DataConnection>()
   var connectionId = ''
@@ -41,7 +42,7 @@ function App() {
     });
 
     peer.on('open', function (id) {
-      console.log("connection successfull, your id: " + id)
+      console.log("connection successful, your id: " + id)
       setId(id)
     });
 
@@ -61,7 +62,7 @@ function App() {
   function onChatChange(e: React.ChangeEvent<HTMLInputElement>) {
     chatMessage = e.target.value
   }
-
+  
   function onSubmitConnectionRequest() {
     setLamportClock(lamportClock + 1)
     connectionInstance.current = peerInstance.current?.connect(connectionId);
@@ -69,14 +70,21 @@ function App() {
       setStateText("successfully connected to: " + connectionId)
       var message: PeerMessage = { senderId: id, lamportClock: lamportClock, message: `${id} has entered the chat`, chatLog: chatLog }
       setChatLog([...chatLog, generateChatString(message)])
+      if(connectionInstance.current !== undefined){
+      setListOfConnections([...listOfConnections, connectionInstance.current])
+      }
       connectionInstance?.current?.send(message);
+      connectionId = '';
     });
   }
+
   function onSubmitChat() {
     setLamportClock(lamportClock + 1)
     var message: PeerMessage = { senderId: id, lamportClock: lamportClock, message: chatMessage, chatLog: chatLog }
     setChatLog([...chatLog, generateChatString(message)])
-    connectionInstance?.current?.send(message);
+    for(let i = 0; i < listOfConnections.length; i++){
+        listOfConnections[i].send(message);
+  }
   }
 
   function generateChatString(message: PeerMessage) {
