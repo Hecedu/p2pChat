@@ -74,7 +74,7 @@ function App() {
       setListOfConnections([...listOfConnections, connectionInstance.current])
       }
       connectionInstance?.current?.send(message);
-      connectionId = '';
+      connectionId = ' ';
     });
   }
 
@@ -92,7 +92,7 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="container">
       <h1>ID: {id}</h1>
       <p>{stateText}</p>
       <div>
@@ -101,6 +101,12 @@ function App() {
           <input type="text" name="name" onChange={onConnectionIdChange} />
         </label>
         <input className="btn btn-primary" type="submit" value="Submit" onClick={onSubmitConnectionRequest}></input>
+      </div>
+      <div>
+        <h4>Current Connections</h4>
+        {listOfConnections.map(connection => {
+          return <p>{connection.peer}</p>
+        })}
       </div>
       <div>
         <h2>Chat</h2>
